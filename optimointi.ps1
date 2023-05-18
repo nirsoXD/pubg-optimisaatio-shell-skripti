@@ -18,18 +18,37 @@ if ($program) {
 
 #Poistetaan leffat
 $movieLocation = "\TslGame\Content\Movies"
+$atozPClocation = "\TslGame\Content\Movies\AtoZ\PC"
+$atozSTADIAlocation = "\TslGame\Content\Movies\AtoZ\STADIA"
+$atozXBOXlocation = "\TslGame\Content\Movies\AtoZ\XBOX_PS"
 $folderPath = "{0}{1}" -f $installationLocation, $movieLocation
-Write-Host "Poistetaan leffat sijainnista: $folderPath"
+$keepPathPC = "{0}{1}" -f $installationLocation, $atozPClocation
+$keepPathSTADIA = "{0}{1}" -f $installationLocation, $atozSTADIAlocation
+$keepPathXBOX = "{0}{1}" -f $installationLocation, $atozXBOXlocation
 
-Get-ChildItem -Path $folderPath -File -Recurse | Remove-Item -Force
+# Write-Host "Poistetaan leffat sijainnista: $folderPath"
 
-$folders = Get-ChildItem -Path $folderPath -Directory -Recurse | Select-Object -ExpandProperty FullName
+# Get-ChildItem -Path $folderPath -File -Recurse | Remove-Item -Force
 
-foreach ($folder in $folders) {
-    Get-ChildItem -Path $folder -File | Remove-Item -Force
-}
+# $folders = Get-ChildItem -Path $folderPath -Directory -Recurse | Select-Object -ExpandProperty FullName
+
+# foreach ($folder in $folders) {
+    # Get-ChildItem -Path $folder -File | Remove-Item -Force
+# }
 
 
+$excludedFolders = @(
+    $keepPathPC,
+    $keepPathSTADIA,
+	$keepPathXBOX
+    # Add additional excluded folder paths as needed
+)
+
+# Delete files in the folder and subfolders, excluding specific folders
+Get-ChildItem -Path $folderPath -File -Recurse | Where-Object { $excludedFolders -notcontains $_.Directory.FullName } | Remove-Item -Force
+
+# Delete files in the main folder, excluding specific folders
+Get-ChildItem -Path $folderPath -File | Where-Object { $excludedFolders -notcontains $_.Directory.FullName } | Remove-Item -Force
 
 #Gameusersettings hommat
 #Etsitään appdata polku TSLGAME kansioon
